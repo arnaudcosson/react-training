@@ -6,7 +6,13 @@ module.exports = {
         new UglifyJsPlugin(
             {
             test: /\.js$/,
-            exclude: /node_modules/
+            exclude: /node_modules/,
+            compress: {
+                warnings: false,
+            },
+            output:{
+                comments: false,
+            }
         })
     ],
     entry: './js/app.js',
