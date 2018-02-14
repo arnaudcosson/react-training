@@ -1,18 +1,23 @@
 {
-  "name": "react_training",
-  "version": "1.0.0",
-  "description": "",
-  "main": "build/app.bundle.js",
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-minify-webpack-plugin": "^0.3.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "uglifyjs-webpack-plugin": "^1.1.8",
-    "webpack": "^3.11.0"
-  },
-  "scripts": {
-    "build": "webpack"
-  }
+	"name": "reactube",
+	"version": "1.0.0",
+	"description": "TP de la formation React",
+	"main": "app.bundle.js",
+	"scripts": {
+		"build": "webpack",
+		"watch": "webpack -d --watch"
+	},
+	"author": "Arnaud Cosson",
+	"license": "ISC",
+	"devDependencies": {
+		"babel-core": "^6.26.0",
+		"babel-loader": "^7.1.2",
+		"babel-preset-env": "^1.6.1",
+		"babel-preset-react": "^6.24.1",
+		"webpack": "^3.11.0"
+	},
+	"dependencies": {
+		"react": "^16.2.0",
+		"react-dom": "^16.2.0"
+	}
 }
