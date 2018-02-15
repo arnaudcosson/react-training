@@ -48,7 +48,9 @@ class Video extends React.Component{
         return nextState.video.file != this.state.video.file;
     }
     componentDidUpdate( prevProps, prevState ) {
-        this.autoPlay();
+        if(prevState.video.id != this.state.video.id){
+            this.autoPlay();
+        }
     }
     
     componentWillUnmount(){
@@ -64,7 +66,9 @@ class Video extends React.Component{
     }
     autoPlay(){
         // Autoplay video
-        this.player.play();
+        if(this.player){
+            this.player.play();
+        }
     }
 }
 export default Video;
