@@ -1,6 +1,7 @@
 import React from 'react';
 // import videos from './videos';
 import request from 'superagent';
+import CommentForm from './CommentForm';
 
 class Video extends React.Component{
     player;
@@ -12,6 +13,7 @@ class Video extends React.Component{
             comments: []
         }
         this.nextVideo = this.nextVideo.bind(this);
+        this.fetchComments = this.fetchComments.bind(this);
     }
     
     render() {
@@ -33,21 +35,8 @@ class Video extends React.Component{
                             </video>
                             <h3>{this.state.video &&this.state.video.title}</h3>
                             {this.state.video && this.state.video.description && <p>{this.state.video.description}</p>}
-                            <form>
-                                <div className="form-group">
-                                    <label htmlFor="content">Ajouter un commentaire</label>
-                                    <textarea
-                                        className="form-control"
-                                        name="content"
-                                        id="content"
-                                        cols="30"
-                                        rows="2"
-                                    />
-                                </div>
-                                <button type="submit" className="btn btn-default">
-                                    Envoyer
-                                </button>
-                            </form>
+                            {this.state.video.id && <CommentForm videoId={this.state.video.id} fetchComments={this.fetchComments}/>}
+                            {this.state.video.id && 
                             <div>
                                 <h4>Commentaires: </h4>
                                 <div className="panel panel-default">
@@ -56,6 +45,7 @@ class Video extends React.Component{
                                     </div>
                                 </div>
                             </div>
+                            }
                             <button onClick={() => this.nextVideo()}>Next video</button>
                         </div>
                     </div>
@@ -65,6 +55,7 @@ class Video extends React.Component{
     }
 
     renderComments(){
+        console.l
         return(
             this.state.comments.map( comment => (
                 <h6 key={comment.id}><small>{comment.content}</small></h6>
@@ -83,7 +74,7 @@ class Video extends React.Component{
     }
     
     shouldComponentUpdate( nextProps, nextState ){
-        return nextState.video.file != this.state.video.file;
+        return nextState.video.file != this.state.video.file || nextState.comments !== this.state.comments ;
     }
     componentDidUpdate( prevProps, prevState ) {
         if(prevState.video.id != this.state.video.id){
