@@ -51,13 +51,13 @@ class CommentForm extends React.Component{
     }
   
     postComment(state){
-        this.state.loading = true;
+        this.setState({loading: true});
         request
         .post(`${config.apiPath}/videos/${this.state.video_id}/comments`)
         .send('content=' + encodeURIComponent(this.state.content))
         .then((response) => {
             this.props.fetchComments();
-            this.state.loading = false;
+            this.setState({loading: false});
             this.clearState();
         });
     }

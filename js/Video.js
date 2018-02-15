@@ -143,11 +143,11 @@ class Video extends React.Component{
     }
 
     voteForVideo(type){
-        this.state.loading = true;
+        this.setState({loading: true});
         request
         .post(`${config.apiPath}/videos/1/${type}`)
         .then((response) => {
-            this.state.loading = false;
+            this.setState({loading: false});
         });
     }
 
