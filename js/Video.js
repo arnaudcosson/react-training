@@ -2,13 +2,14 @@ import React from 'react';
 import videos from './videos'
 
 class Video extends React.Component{
+    player;
     constructor(...args) {
         super(...args);
         this.state = {
             selectedIndex: 0,
             video: videos[0]
         }
-        this.changeVideo = this.changeVideo.bind(this);
+        this.nextVideo = this.nextVideo.bind(this);
     }
     
     render() {
@@ -21,7 +22,7 @@ class Video extends React.Component{
                 <div className="col-sm-12 col-md-12">
                     <div className="thumbnail">
                         <div className="caption">
-                            <video
+                            <video ref={ el => this.player = el }
                                 style={style}
                                 height="300"
                                 controls
@@ -30,6 +31,7 @@ class Video extends React.Component{
                             </video>
                             <h3>{this.state.video &&this.state.video.title}</h3>
                             {this.state.video && this.state.video.description && <p>{this.state.video.description}</p>}
+                            <button onClick={() => this.nextVideo()}>Next video</button>
                         </div>
                     </div>
                 </div>
@@ -38,23 +40,31 @@ class Video extends React.Component{
     }
     
     componentDidMount(){
-        this.interval = setInterval(this.changeVideo, 5000);
+        this.autoPlay();
+        // this.interval = setInterval(this.nextVideo, 5000);
     }
     
     shouldComponentUpdate( nextProps, nextState ){
         return nextState.video.file != this.state.video.file;
     }
-
-    componentWillUnmount(){
-        clearInterval(this.interval);
+    componentDidUpdate( prevProps, prevState ) {
+        this.autoPlay();
     }
-
-    changeVideo(){
+    
+    componentWillUnmount(){
+        // clearInterval(this.interval);
+    }
+    
+    nextVideo(){
         let newIndex = (this.state.selectedIndex+1) % videos.length;
         this.setState({
             selectedIndex: newIndex,
             video: videos[newIndex]
         });
+    }
+    autoPlay(){
+        // Autoplay video
+        this.player.play();
     }
 }
 export default Video;

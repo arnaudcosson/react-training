@@ -3,6 +3,6 @@ import ReactDOM from 'react-dom';
 import Video from "./Video"
 import VideoList from './VideoList';
 ReactDOM.render(
-    <VideoList />,
+    <Video />,
     document.getElementById( 'app' )
 );
