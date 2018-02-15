@@ -1,116 +1,71 @@
-
 import React from 'react';
-import request from 'superagent';
-class VideoForm extends React.Component{
-    fileInput;
-    constructor(props){
-        super(props);
-        this.handleTitleChange = this.handleTitleChange.bind(this);
-        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-        this.handleFileChange = this.handleFileChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { postVideo } from '../actions';
 
-        this.state = {
-            title: '',
-            description: '',
-            file: ''
-        }
-    }
-
-    render(){
-        return (
-        <form onSubmit={this.handleSubmit}>
-            <h3>Ajouter une vidéo</h3>
-            <div className="form-group">
-                <label htmlFor="title">Titre</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    name="title"
-                    id="title"
-                    onChange={this.handleTitleChange}
-                    value={this.state.title}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                    className="form-control"
-                    name="description"
-                    id="description"
-                    cols="30"
-                    rows="2"
-                    onChange={this.handleDescriptionChange}
-                    value={this.state.description}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="file">Fichier</label>
-                <input
-                    type="file"
-                    className="form-control"
-                    name="file"
-                    id="file"
-                    onChange={this.handleFileChange}
-                    value={this.state.file}
-                    ref={ el => this.fileInput = el }
-                />
-            </div>
-            <button type="submit" className="btn btn-default">
-                Envoyer
-            </button>
-        </form>
-        );
-    }
-
-    handleTitleChange(event){
-        this.setState(
-            {
-                title: event.target.value 
-            }
-        );
-    }
-    handleDescriptionChange(event){
-        this.setState(
-            {
-                description: event.target.value 
-            }
-        );
-    }
-    handleFileChange(event){
-        this.setState(
-            {
-                file: event.target.value 
-            }
-        );
-    }
-
-    handleSubmit(event){
-        event.preventDefault();
-        this.postVideo(this.state);
-    }
-
-    postVideo(){
-        console.log("post video");
-        request
-            .post(`${config.apiPath}/videos`)
-            .field('title', this.state.title)
-            .field('description', this.state.description)
-            .attach('file', this.fileInput.files[0])
-            .then( (response) => {
-                console.log(response);
-                this.clearState();
-            }
-        )
-
-    }
-
-    clearState(){
-        this.setState({
-            title: '',
-            description: '',
-            file: ''
-        });
-    }
+function mapStateToProps( state )
+{
+	return { isLoading: state.newVideo.isLoading };
 }
-export default VideoForm;
+function mapDispatchToProps( dispatch )
+{
+    return bindActionCreators( {postVideo}, dispatch );
+}
+
+class VideoForm extends React.Component {
+	constructor( props ) {
+		super( props );
+		this.handleSubmit = this.handleSubmit.bind( this );
+	}
+
+	render () {
+		return (
+			<form onSubmit={this.handleSubmit}>
+			  <div className="form-group">
+				<label htmlFor="title">Titre</label>
+				<input
+					required
+					type="text"
+					className="form-control"
+					id="title"
+					ref={el => this.titleInput = el} />
+			  </div>
+			  <div className="form-group">
+				<label htmlFor="description">Description</label>
+				<textarea
+					required
+					className="form-control"
+					name="description"
+					id="description"
+					ref={el => this.descriptionInput = el}
+					cols="30"
+					rows="10"></textarea>
+			  </div>
+			  <div className="form-group">
+				<label htmlFor="file">Video</label>
+				<input
+					required
+					type="file"
+					id="file"
+					ref={el => this.fileInput = el} />
+			  </div>
+				<button type="submit" className="btn btn-default" disabled={this.props.isLoading}>
+				  {!this.props.isLoading ? 'Ajouter' : 'Enregistrement...'}
+				</button>
+			</form>
+		);
+	}
+
+	handleSubmit( event ) {
+		event.preventDefault();
+		const video = {
+			title: this.titleInput.value,
+			description: this.descriptionInput.value,
+			file: this.fileInput.files[0],
+		};
+		this.props.postVideo(video);
+	}
+
+}
+
+export default connect( mapStateToProps, mapDispatchToProps )( VideoForm );

@@ -1,136 +1,124 @@
 import React from 'react';
-// import videos from './videos';
-import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import request from 'superagent';
-import {fetchVideo} from '../actions/index';
-import CommentForm from '../components/CommentForm';
+import { connect } from 'react-redux';
+import { fetchVideo, fetchComments, postComment, updateCommentInput } from '../actions';
 
-function mapStateToProps( state ){
-    return {
-        video: state.video,
-        loading: state.loading
-    }
+function mapStateToProps( state )
+{
+	return {
+		video: state.video,
+		comments: state.comments,
+		newComment: state.newComment,
+	};
 }
 
 function mapDispatchToProps( dispatch )
 {
-    return bindActionCreators( {fetchVideo}, dispatch );
+    return bindActionCreators( {
+    	fetchVideo,
+    	fetchComments,
+    	postComment,
+    	updateCommentInput}, dispatch );
 }
 
-class Video extends React.Component{
-    player;
-    constructor(...args) {
-        super(...args);
-        this.nextVideo = this.nextVideo.bind(this);
-        this.voteForVideo = this.voteForVideo.bind(this);
-    }
-    
-    render() {
-        let style = {
-            width: '100%',
-            backgroundColor: 'black'
-        }
-        return (        
-            <div className="row marketing">
-                <div className="col-sm-12 col-md-12">
-                    <div className="thumbnail">
-                        <div className="caption">
-                            <video ref={ el => this.player = el }
-                                style={style}
-                                height="300"
-                                controls
-                                src={this.props.video && this.props.video.file}
-                            >
-                            </video>
-                            <h3>{this.props.video &&this.props.video.title}</h3>
-                            {this.props.video && this.props.video.description && <p>{this.props.video.description}</p>}
-                            {this.props.video.id && <CommentForm videoId={this.props.video.id} fetchComments={this.props.fetchComments}/>}
-                            {this.props.video.id && 
-                            <div>
-                                <h4>Commentaires: </h4>
-                                <div className="panel panel-default">
-                                    <div className="panel-body">
-                                        {this.renderComments()}                                        
-                                    </div>
-                                </div>
-                            </div>
-                            }
-                            <button onClick={() => this.voteForVideo('likes')} disabled={this.props.loading}><i className="fas fa-thumbs-up"></i></button>
-                            <button onClick={() => this.voteForVideo('dislikes')} disabled={this.props.loading}><i className="fas fa-thumbs-down"></i></button>
-                            <button onClick={() => this.nextVideo()}>Next video</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
 
-    renderComments(){
-        console.log(this.props.video);
-        if(this.props.video && this.props.video.comments) {
-            return(
-                    this.props.video.comments.map( (comment, index) => (
-                    <h6 key={index}><small>{comment.content}</small></h6>
-                ) )
-            )
-        }
-    }
+class Video extends React.Component {
 
-    componentWillMount(){
-        this.props.fetchVideo();
-        // this.fetchComments();
-    }
+	constructor() {
+		super();
+		this.id = 1;
+		this.handleSubmit = this.handleSubmit.bind( this );
+		this.handleCommentInputChange = this.handleCommentInputChange.bind( this );
+	}
 
-    componentDidMount(){
-        // this.autoPlay();
-        // this.interval = setInterval(this.nextVideo, 5000);
-    }
-    
-    shouldComponentUpdate( nextProps, nextState ){
-        return nextProps.video.file != this.props.video.file || nextProps.video.comments !== this.props.video.comments ;
-    }
-    componentDidUpdate( prevProps, prevState ) {
-        if(prevProps.video.id != this.props.video.id){
-            this.autoPlay();
-        }
-    }
-    
-    componentWillUnmount(){
-        // clearInterval(this.interval);
-    }
-    
-    nextVideo(){
-        let newIndex = (this.state.selectedIndex+1) % videos.length;
-        this.setState({
-            selectedIndex: newIndex,
-            video: videos[newIndex]
-        });
-    }
+	componentWillMount(){
+		this.props.fetchVideo(this.id);
+		this.props.fetchComments(this.id);
+	}
 
-    autoPlay(){
-        // Autoplay video
-        if(this.player){
-            this.player.play();
-        }
-    }
-    
-    fetchVideo(){
-        this.props.fetchVideo();
-    }
-    
-    fetchComments(){
-        this.props.fetchComments();
-    }
+	componentDidUpdate(prevProps, prevState){
+		if (this.props.video && (!prevProps.video || prevProps.video.id != this.props.video.id ) ) {
+			this.playVideo();
+		}
+	}
 
-    voteForVideo(type){
-        this.setState({loading: true});
-        request
-        .post(`${config.apiPath}/videos/1/${type}`)
-        .then((response) => {
-            this.setState({loading: false});
-        });
-    }
+	playVideo() {
+		if ( this.video ) {
+			this.video.play();
+		}
+	}
+
+	render() {
+		return (
+			<div className="row marketing">
+				<div className="col-sm-12 col-md-12">
+					<div className="thumbnail">
+						<div className="caption">
+							<video
+								style={{ width: '100%', backgroundColor: 'black' }}
+								ref={el => this.video = el}
+								height="300"
+								controls
+								src={this.props.video && './uploads/' + this.props.video.file}
+							>
+							</video>
+							<h3>{this.props.video ? this.props.video.title : 'Chargement en cours'}</h3>
+							<p>{this.props.video && this.props.video.description}</p>
+						</div>
+						<form onSubmit={this.handleSubmit}>
+						  <div className="form-group">
+							<label htmlFor="content">Ajouter un commentaire</label>
+							<textarea
+								ref={el => this.commentInput = el}
+								className="form-control"
+								value={this.props.newComment.input}
+								onChange={this.handleCommentInputChange}
+								name="content"
+								id="content"
+								cols="30"
+								rows="2"
+								disabled={this.props.newComment.isLoading}
+							/>
+						  </div>
+						  <button type="submit" className="btn btn-default" disabled={this.props.newComment.isLoading}>
+							{!this.props.newComment.isLoading ? 'Envoyer' : 'Envoi en cours...'}
+						  </button>
+						</form>
+						<div>
+							<h4>Commentaires: </h4>
+							{ this.renderComments() }
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	renderComments(){
+		return this.props.comments.map(( comment ) => {
+			return (
+				<div key={comment.id} className="panel panel-default">
+				  <div className="panel-body">
+					<h6><small>Le {(new Date(comment.created_at)).toLocaleString()}</small></h6>
+					{comment.content}
+				  </div>
+				</div>
+			);
+		});
+	}
+
+	handleCommentInputChange( event ) {
+		this.props.updateCommentInput( this.commentInput.value );
+	}
+
+	handleSubmit( event ) {
+		event.preventDefault();
+		this.props.postComment({
+			videoId: this.props.video.id,
+			content: this.commentInput.value
+		});
+	}
 
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Video);
+
+export default connect( mapStateToProps, mapDispatchToProps)( Video );

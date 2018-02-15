@@ -1,69 +1,109 @@
-// Créer un action creator fetchVideos() dans le fichier actions/index.js. Cet action creator devra :
-
 import request from 'superagent';
+import config from 'config';
 
+// Liste Vidéos
 export const VIDEO_LIST_COMPLETE = 'VIDEO_LIST_COMPLETE';
+// Ajout video
+export const POST_VIDEO_LOADING = 'POST_VIDEO_LOADING';
+export const POST_VIDEO_COMPLETE = 'POST_VIDEO_COMPLETE';
+// détail vidéo
 export const VIDEO_COMPLETE = 'VIDEO_COMPLETE';
-export const VIDEO_COMMENTS_COMPLETE = 'VIDEO_COMMENTS_COMPLETE';
-export const COMMENT_CHANGE = 'COMMENTS_CHANGE';
-export const COMMENT_ADDED = 'COMMENTS_ADDED';
+// liste commentaires
+export const COMMENT_LIST_COMPLETE = 'COMMENT_LIST_COMPLETE';
+// ajout commentaire
+export const POST_COMMENT_LOADING = 'POST_COMMENT_LOADING';
+export const POST_COMMENT_COMPLETE = 'POST_COMMENT_COMPLETE';
+export const COMMENT_INPUT = 'COMMENT_INPUT';
 
-export default function fetchVideos(){
-    return function( dispatch, getState ) {
-        request
-        .get(`${config.apiPath}/videos`)
-        .then((res) => {
-            dispatch( {type: VIDEO_LIST_COMPLETE, videos: res.body} );
-            // res.body, res.headers, res.status
-        })
-        .catch(function(err) {
-            // err.message, err.response
-        });
-    }
+
+
+export function fetchVideos(){
+	return (dispatch, getState) => {
+		return request
+		.get( `${config.apiPath}/videos` )
+		.then(
+			( response ) => {
+				dispatch({
+					type: VIDEO_LIST_COMPLETE,
+					videos: response.body
+				});
+			}
+		)
+	}
 }
 
-export function fetchVideo(){
-    console.log('fetchVideo');
-    return function( dispatch, getState ) {
-        request
-        .get(`${config.apiPath}/videos/1`)
-        .then((res) => {
-            dispatch( {type: VIDEO_COMPLETE, video: res.body} );
-            dispatch( fetchComments() );
-        })
-        .catch(function(err) {
-            // err.message, err.response
-        });
-    }
+export function postVideo(video) {
+	const {title, description, file} = video;
+	return ( dispatch, getState ) => {
+		dispatch( { type: POST_VIDEO_LOADING, video: video } );
+		return request
+			.post( `${config.apiPath}/videos` )
+			.field('title', title)
+			.field('description', description)
+			.attach('file', file)
+			.then(
+				( response ) => {
+					dispatch( {
+						type: POST_VIDEO_COMPLETE,
+						video: response.body
+					} );
+				}
+			);
+	}
 }
 
-export function fetchComments(){
-    return function( dispatch, getState ) {
-        request
-        .get(`${config.apiPath}/videos/1/comments`)
-        .then((res) => {
-            dispatch( {type: VIDEO_COMMENTS_COMPLETE, comments: res.body} );
-        })
-        .catch(function(err) {
-            // err.message, err.response
-        });
-    }
+export function fetchVideo( videoId ) {
+	return ( dispatch, getState ) => {
+		return request
+			.get( `${config.apiPath}/videos/${videoId}` )
+			.then(
+				( response ) => {
+					dispatch( {
+						type: VIDEO_COMPLETE,
+						video: response.body
+					} );
+				}
+			);
+	}
 }
 
-export function commentChanged(value){
-    return {
-        type: COMMENT_CHANGE,
-        content: value
-    }
+export function fetchComments( videoId ){
+	return ( dispatch, getState ) => {
+		return request
+			.get( `${config.apiPath}/videos/${videoId}/comments` )
+			.then(
+				( response ) => {
+					dispatch({
+						type: COMMENT_LIST_COMPLETE,
+						comments: response.body
+					});
+				}
+			);
+	};
 }
-export function postComment(){
-    return function( dispatch, getState ) {
-        // this.setState({loading: true});
-        request
-        .post(`${config.apiPath}/videos/1/comments`)
-        .send('content=' + encodeURIComponent(getState().content))
-        .then((response) => {
-            dispatch( {type: COMMENT_ADDED, comment: response.body} );
-        });
-    }
+
+export function postComment( { videoId, content } ) {
+	return ( dispatch, getState ) => {
+		dispatch( { type: POST_COMMENT_LOADING } );
+		return request
+			.post( `${config.apiPath}/videos/${videoId}/comments` )
+			.send( 'content=' + encodeURIComponent( content ) )
+			.then(
+				( response ) => {
+					dispatch( {
+						type: POST_COMMENT_COMPLETE,
+						comment: response.body
+					} );
+					dispatch( fetchComments( videoId ) );
+				}
+			);
+	};
+}
+
+
+export function updateCommentInput( input ) {
+	return {
+		type: COMMENT_INPUT,
+		input
+	};
 }
