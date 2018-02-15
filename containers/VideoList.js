@@ -1,14 +1,11 @@
 import React from 'react';
 // import videos from './videos'
 import VideoItem from '../components/VideoItem';
-import config from 'config';
-import request from 'superagent';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import fetchVideos from '../actions/index';
 
 function mapStateToProps( state ){
-    console.log("mapStateToProps");
     return {
         videos: state.videos,
     }

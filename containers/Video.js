@@ -1,20 +1,28 @@
 import React from 'react';
 // import videos from './videos';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import request from 'superagent';
+import {fetchVideo} from '../actions/index';
 import CommentForm from '../components/CommentForm';
+
+function mapStateToProps( state ){
+    return {
+        video: state.video,
+        loading: state.loading
+    }
+}
+
+function mapDispatchToProps( dispatch )
+{
+    return bindActionCreators( {fetchVideo}, dispatch );
+}
 
 class Video extends React.Component{
     player;
     constructor(...args) {
         super(...args);
-        this.state = {
-            selectedIndex: 0,
-            video: {},
-            comments: [],
-            loading: false
-        }
         this.nextVideo = this.nextVideo.bind(this);
-        this.fetchComments = this.fetchComments.bind(this);
         this.voteForVideo = this.voteForVideo.bind(this);
     }
     
@@ -32,13 +40,13 @@ class Video extends React.Component{
                                 style={style}
                                 height="300"
                                 controls
-                                src={this.state.video && this.state.video.file}
+                                src={this.props.video && this.props.video.file}
                             >
                             </video>
-                            <h3>{this.state.video &&this.state.video.title}</h3>
-                            {this.state.video && this.state.video.description && <p>{this.state.video.description}</p>}
-                            {this.state.video.id && <CommentForm videoId={this.state.video.id} fetchComments={this.fetchComments}/>}
-                            {this.state.video.id && 
+                            <h3>{this.props.video &&this.props.video.title}</h3>
+                            {this.props.video && this.props.video.description && <p>{this.props.video.description}</p>}
+                            {this.props.video.id && <CommentForm videoId={this.props.video.id} fetchComments={this.props.fetchComments}/>}
+                            {this.props.video.id && 
                             <div>
                                 <h4>Commentaires: </h4>
                                 <div className="panel panel-default">
@@ -48,8 +56,8 @@ class Video extends React.Component{
                                 </div>
                             </div>
                             }
-                            <button onClick={() => this.voteForVideo('likes')} disabled={this.state.loading}><i className="fas fa-thumbs-up"></i></button>
-                            <button onClick={() => this.voteForVideo('dislikes')} disabled={this.state.loading}><i className="fas fa-thumbs-down"></i></button>
+                            <button onClick={() => this.voteForVideo('likes')} disabled={this.props.loading}><i className="fas fa-thumbs-up"></i></button>
+                            <button onClick={() => this.voteForVideo('dislikes')} disabled={this.props.loading}><i className="fas fa-thumbs-down"></i></button>
                             <button onClick={() => this.nextVideo()}>Next video</button>
                         </div>
                     </div>
@@ -59,16 +67,19 @@ class Video extends React.Component{
     }
 
     renderComments(){
-        return(
-            this.state.comments.map( comment => (
-                <h6 key={comment.id}><small>{comment.content}</small></h6>
-            ) )
-        )
+        console.log(this.props.video);
+        if(this.props.video && this.props.video.comments) {
+            return(
+                    this.props.video.comments.map( (comment, index) => (
+                    <h6 key={index}><small>{comment.content}</small></h6>
+                ) )
+            )
+        }
     }
 
     componentWillMount(){
-        this.fetchVideo();
-        this.fetchComments();
+        this.props.fetchVideo();
+        // this.fetchComments();
     }
 
     componentDidMount(){
@@ -77,10 +88,10 @@ class Video extends React.Component{
     }
     
     shouldComponentUpdate( nextProps, nextState ){
-        return nextState.video.file != this.state.video.file || nextState.comments !== this.state.comments ;
+        return nextProps.video.file != this.props.video.file || nextProps.video.comments !== this.props.video.comments ;
     }
     componentDidUpdate( prevProps, prevState ) {
-        if(prevState.video.id != this.state.video.id){
+        if(prevProps.video.id != this.props.video.id){
             this.autoPlay();
         }
     }
@@ -105,36 +116,11 @@ class Video extends React.Component{
     }
     
     fetchVideo(){
-        request
-        .get(`${config.apiPath}/videos/1`)
-        .then((res) => {
-            // console.log(res.body);
-            this.setState(
-                {
-                    video: res.body
-                }
-            );
-            // res.body, res.headers, res.status
-        })
-        .catch(function(err) {
-            // err.message, err.response
-        });
+        this.props.fetchVideo();
     }
-
+    
     fetchComments(){
-        request
-        .get(`${config.apiPath}/videos/1/comments`)
-        .then((res) => {
-            this.setState(
-                {
-                    comments: res.body
-                }
-            );
-            // res.body, res.headers, res.status
-        })
-        .catch(function(err) {
-            // err.message, err.response
-        });
+        this.props.fetchComments();
     }
 
     voteForVideo(type){
@@ -147,4 +133,4 @@ class Video extends React.Component{
     }
 
 }
-export default Video;
+export default connect(mapStateToProps, mapDispatchToProps)(Video);

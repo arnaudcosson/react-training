@@ -1,5 +1,22 @@
 import React from 'react';
 import request from 'superagent';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { commentChanged } from '../actions/index';
+import { postComment } from '../actions/index';
+
+function mapStateToProps( state ){
+    return {
+        content: state.content,
+        loading: state.loading,
+        content: state.content,
+    }
+}
+
+function mapDispatchToProps( dispatch )
+{
+    return bindActionCreators( {commentChanged, postComment}, dispatch );
+}
 
 class CommentForm extends React.Component{
     constructor(props) {
@@ -26,41 +43,38 @@ class CommentForm extends React.Component{
                     cols="30"
                     rows="2"
                     onChange={this.handleContentChange}
-                    value={this.state.content}
-                    disabled={this.state.loading}
+                    value={this.props.content}
+                    disabled={this.props.loading}
                 />
             </div>
-            <button type="submit" className="btn btn-default" disabled={this.state.loading}>
+            <button type="submit" className="btn btn-default" disabled={this.props.loading}>
                 Envoyer
             </button>
         </form>
         );
     }
     
+     
     handleContentChange(event){
-        this.setState(
-            {
-                content: event.target.value 
-            }
-        );
+        this.props.commentChanged(event.target.value);
     }
 
     handleSubmit(event){
         event.preventDefault();
-        this.postComment(this.state);
+        this.props.postComment();
     }
   
-    postComment(state){
-        this.setState({loading: true});
-        request
-        .post(`${config.apiPath}/videos/${this.state.video_id}/comments`)
-        .send('content=' + encodeURIComponent(this.state.content))
-        .then((response) => {
-            this.props.fetchComments();
-            this.setState({loading: false});
-            this.clearState();
-        });
-    }
+    // postComment(state){
+    //     this.setState({loading: true});
+    //     request
+    //     .post(`${config.apiPath}/videos/${this.state.video_id}/comments`)
+    //     .send('content=' + encodeURIComponent(this.state.content))
+    //     .then((response) => {
+    //         this.props.fetchComments();
+    //         this.setState({loading: false});
+    //         this.clearState();
+    //     });
+    // }
 
     clearState(){
         this.setState({
@@ -70,4 +84,4 @@ class CommentForm extends React.Component{
     }
 }
 
-export default CommentForm;
+export default connect(mapStateToProps, mapDispatchToProps)(CommentForm);

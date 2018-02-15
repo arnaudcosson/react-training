@@ -15,7 +15,7 @@ const store = createStore(
  
 ReactDOM.render(
     <Provider store={store}>
-        <VideoList />
+        <Video />
     </Provider>,
     document.getElementById( 'app' )
 );
