@@ -23,6 +23,9 @@ module.exports = {
 		]
 	},
 	devtool: 'source-map',
+	externals: {
+		'config': 'config',
+	},
 	// plugins: [
 	// 	new webpack.optimize.UglifyJsPlugin({
 	// 		compress: {

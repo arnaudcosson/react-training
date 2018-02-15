@@ -1,17 +1,19 @@
 import React from 'react';
-import videos from './videos'
+// import videos from './videos'
 import VideoItem from './VideoItem';
+import config from 'config';
+import request from 'superagent';
 
 class VideoList extends React.Component{
     constructor(...args) {
         super(...args);
         this.state = 
         {
-            videos: videos
+            videos: []
         };
         this.addNewVideo = this.addNewVideo.bind(this);
     }
-
+    
     render(){
         return (
             <div className="row marketing">
@@ -25,7 +27,7 @@ class VideoList extends React.Component{
             </div>
         )
     }
-
+    
     
     addNewVideo(){
         const sampleVideo = {
@@ -35,6 +37,23 @@ class VideoList extends React.Component{
         }
         this.setState( {
             videos: [{id: this.state.videos.length+1, ...sampleVideo}, ...this.state.videos ]
+        });
+    }
+    
+    componentWillMount(){
+        request
+        .get(config.apiPath+'/videos')
+        .then((res) => {
+            console.log(res.body);
+            this.setState(
+                {
+                    videos: res.body
+                }
+            );
+            // res.body, res.headers, res.status
+        })
+        .catch(function(err) {
+            // err.message, err.response
         });
     }
 
