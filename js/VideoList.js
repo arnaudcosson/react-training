@@ -1,24 +1,13 @@
 import React from 'react';
+import videos from './videos'
+import VideoItem from './VideoItem';
 
 class VideoList extends React.Component{
     constructor(...args) {
         super(...args);
         this.state = 
         {
-            videos: [
-                {
-                    id: 1,
-                    title: 'The first video',
-                    description: 'An amazing bunny video from Internet',
-                    file: 'http://sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4'
-                },
-                {
-                    id: 2,
-                    title: 'The second video',
-                    description: 'An amazing video from Internet',
-                    file: 'http://sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4'
-                }
-            ]
+            videos: videos
         };
         this.addNewVideo = this.addNewVideo.bind(this);
     }
@@ -29,19 +18,7 @@ class VideoList extends React.Component{
                 <div className="col-lg-12">
                     <ul className="media-list">
                     {this.state.videos.map( video => (
-                        <li key={video.id}
-                            className="media">
-                            <div className="media-left">
-                            <img className="media-object"
-                            alt="cat" src='https://loremflickr.com/320/240/cat?r=0.1267489'
-                            width="120"
-                            height="70" />
-                            </div>
-                            <div className="media-body">
-                                <h4 className="media-heading">{video.title}</h4>
-                                <p>{video.description}</p>
-                            </div>
-                        </li>
+                        <VideoItem video={video} key={video.id}/>
                     ) )}
                     </ul>
                 </div>
@@ -49,6 +26,7 @@ class VideoList extends React.Component{
         )
     }
 
+    
     addNewVideo(){
         const sampleVideo = {
             title: 'The first video',
@@ -61,7 +39,7 @@ class VideoList extends React.Component{
     }
 
     componentDidMount(){
-        this.interval = setInterval(this.addNewVideo, 2000);
+        // this.interval = setInterval(this.addNewVideo, 2000);
     }
 }
 
