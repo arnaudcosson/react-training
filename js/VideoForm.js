@@ -99,9 +99,18 @@ class VideoForm extends React.Component{
             .attach('file', this.fileInput.files[0])
             .then( (response) => {
                 console.log(response);
+                this.clearState();
             }
-        );
+        )
 
+    }
+
+    clearState(){
+        this.setState({
+            title: '',
+            description: '',
+            file: ''
+        });
     }
 }
 export default VideoForm;

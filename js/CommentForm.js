@@ -6,11 +6,12 @@ class CommentForm extends React.Component{
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleContentChange =this.handleContentChange.bind(this);
+        this.clearState =this.clearState.bind(this);
         this.state = {
             video_id: props.videoId,
-            content: ''
+            content: '',
+            loading: false
         };
-        console.log(this.state);
     }
     
     render(){
@@ -26,9 +27,10 @@ class CommentForm extends React.Component{
                     rows="2"
                     onChange={this.handleContentChange}
                     value={this.state.content}
+                    disabled={this.state.loading}
                 />
             </div>
-            <button type="submit" className="btn btn-default">
+            <button type="submit" className="btn btn-default" disabled={this.state.loading}>
                 Envoyer
             </button>
         </form>
@@ -49,15 +51,22 @@ class CommentForm extends React.Component{
     }
   
     postComment(state){
-        console.log(state);
+        this.state.loading = true;
         request
         .post(`${config.apiPath}/videos/${this.state.video_id}/comments`)
         .send('content=' + encodeURIComponent(this.state.content))
         .then((response) => {
-            console.log(JSON.stringify(response.body));
             this.props.fetchComments();
+            this.state.loading = false;
+            this.clearState();
         });
+    }
 
+    clearState(){
+        this.setState({
+            video_id: this.props.videoId,
+            content: ''
+        });
     }
 }
 

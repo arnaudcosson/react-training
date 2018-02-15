@@ -11,10 +11,12 @@ class Video extends React.Component{
         this.state = {
             selectedIndex: 0,
             video: {},
-            comments: []
+            comments: [],
+            loading: false
         }
         this.nextVideo = this.nextVideo.bind(this);
         this.fetchComments = this.fetchComments.bind(this);
+        this.voteForVideo = this.voteForVideo.bind(this);
     }
     
     render() {
@@ -47,6 +49,8 @@ class Video extends React.Component{
                                 </div>
                             </div>
                             }
+                            <button onClick={() => this.voteForVideo('likes')} disabled={this.state.loading}><i className="fas fa-thumbs-up"></i></button>
+                            <button onClick={() => this.voteForVideo('dislikes')} disabled={this.state.loading}><i className="fas fa-thumbs-down"></i></button>
                             <button onClick={() => this.nextVideo()}>Next video</button>
                         </div>
                     </div>
@@ -60,7 +64,6 @@ class Video extends React.Component{
     }
 
     renderComments(){
-        console.l
         return(
             this.state.comments.map( comment => (
                 <h6 key={comment.id}><small>{comment.content}</small></h6>
@@ -127,7 +130,6 @@ class Video extends React.Component{
         request
         .get(`${config.apiPath}/videos/1/comments`)
         .then((res) => {
-            console.log(res.body);
             this.setState(
                 {
                     comments: res.body
@@ -137,6 +139,15 @@ class Video extends React.Component{
         })
         .catch(function(err) {
             // err.message, err.response
+        });
+    }
+
+    voteForVideo(type){
+        this.state.loading = true;
+        request
+        .post(`${config.apiPath}/videos/1/${type}`)
+        .then((response) => {
+            this.state.loading = false;
         });
     }
 
