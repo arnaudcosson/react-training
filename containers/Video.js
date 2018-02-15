@@ -1,8 +1,7 @@
 import React from 'react';
 // import videos from './videos';
 import request from 'superagent';
-import CommentForm from './CommentForm';
-import VideoForm from './VideoForm';
+import CommentForm from '../components/CommentForm';
 
 class Video extends React.Component{
     player;
@@ -54,10 +53,6 @@ class Video extends React.Component{
                             <button onClick={() => this.nextVideo()}>Next video</button>
                         </div>
                     </div>
-                    <div className="thumbnail">
-                        <VideoForm />
-                    </div>
-
                 </div>
             </div>
         )
