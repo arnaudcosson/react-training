@@ -1,5 +1,6 @@
 import React from 'react';
-import videos from './videos'
+// import videos from './videos';
+import request from 'superagent';
 
 class Video extends React.Component{
     player;
@@ -7,7 +8,7 @@ class Video extends React.Component{
         super(...args);
         this.state = {
             selectedIndex: 0,
-            video: videos[0]
+            video: {}
         }
         this.nextVideo = this.nextVideo.bind(this);
     }
@@ -38,7 +39,23 @@ class Video extends React.Component{
             </div>
         )
     }
-    
+    componentWillMount(){
+        request
+        .get(`${config.apiPath}/videos/1`)
+        .then((res) => {
+            console.log(res.body);
+            this.setState(
+                {
+                    video: res.body
+                }
+            );
+            // res.body, res.headers, res.status
+        })
+        .catch(function(err) {
+            // err.message, err.response
+        });
+        config.apiPath + "/videos/:id"
+    }
     componentDidMount(){
         this.autoPlay();
         // this.interval = setInterval(this.nextVideo, 5000);
