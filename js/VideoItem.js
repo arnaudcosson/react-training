@@ -22,6 +22,8 @@ export default function VideoItem( props ){
 VideoItem.propTypes = {
     video: PropTypes.shape({
         id: PropTypes.number,
+        title: PropTypes.string.isRequired,
+        description: PropTypes.string,
         file: PropTypes.string.isRequired
-      }) 
+      }).isRequired
 }
