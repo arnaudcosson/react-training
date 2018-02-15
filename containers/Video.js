@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { fetchVideo, fetchComments, postComment, updateCommentInput } from '../actions';
+import { fetchVideo, fetchComments, postComment, updateCommentInput, likeVideo, dislikeVideo } from '../actions';
 
 function mapStateToProps( state )
 {
@@ -18,7 +18,9 @@ function mapDispatchToProps( dispatch )
     	fetchVideo,
     	fetchComments,
     	postComment,
-    	updateCommentInput}, dispatch );
+		updateCommentInput,
+		likeVideo,
+		dislikeVideo}, dispatch );
 }
 
 
@@ -29,6 +31,8 @@ class Video extends React.Component {
 		this.id = 1;
 		this.handleSubmit = this.handleSubmit.bind( this );
 		this.handleCommentInputChange = this.handleCommentInputChange.bind( this );
+		this.likeVideo = this.likeVideo.bind( this );
+		this.dislikeVideo = this.dislikeVideo.bind( this );
 	}
 
 	componentWillMount(){
@@ -64,6 +68,8 @@ class Video extends React.Component {
 							</video>
 							<h3>{this.props.video ? this.props.video.title : 'Chargement en cours'}</h3>
 							<p>{this.props.video && this.props.video.description}</p>
+							<button onClick={this.likeVideo}><i className="far fa-thumbs-up"></i></button>
+							<button onClick={this.dislikeVideo}><i className="far fa-thumbs-down"></i></button>
 						</div>
 						<form onSubmit={this.handleSubmit}>
 						  <div className="form-group">
@@ -117,6 +123,14 @@ class Video extends React.Component {
 			videoId: this.props.video.id,
 			content: this.commentInput.value
 		});
+	}
+
+	likeVideo(){
+		this.props.likeVideo( this.props.video.id);
+	}
+
+	dislikeVideo(){
+		this.props.dislikeVideo( this.props.video.id);
 	}
 
 }

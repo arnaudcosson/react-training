@@ -14,6 +14,8 @@ export const COMMENT_LIST_COMPLETE = 'COMMENT_LIST_COMPLETE';
 export const POST_COMMENT_LOADING = 'POST_COMMENT_LOADING';
 export const POST_COMMENT_COMPLETE = 'POST_COMMENT_COMPLETE';
 export const COMMENT_INPUT = 'COMMENT_INPUT';
+// Like vidéo
+export const POST_LIKE_COMPLETE = 'POST_LIKE_COMPLETE';
 
 
 
@@ -97,13 +99,40 @@ export function postComment( { videoId, content } ) {
 					dispatch( fetchComments( videoId ) );
 				}
 			);
-	};
+    };
 }
-
-
+    
+    
 export function updateCommentInput( input ) {
-	return {
-		type: COMMENT_INPUT,
-		input
-	};
+    return {
+        type: COMMENT_INPUT,
+        input
+    };
+}
+    
+export function likeVideo( videoId ){
+    return ( dispatch, getState ) => {
+    return request
+        .post( `${config.apiPath}/videos/${videoId}/likes` )
+        .then(
+            ( response ) => {
+                dispatch( {
+                    type: POST_LIKE_COMPLETE
+                } );
+            }
+        );
+    }
+}
+export function dislikeVideo( videoId ){
+    return ( dispatch, getState ) => {
+    return request
+        .post( `${config.apiPath}/videos/${videoId}/dislikes` )
+        .then(
+            ( response ) => {
+                dispatch( {
+                    type: POST_LIKE_COMPLETE
+                } );
+            }
+        );
+    }
 }
