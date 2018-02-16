@@ -36,8 +36,9 @@ class Video extends React.Component {
 	}
 
 	componentWillMount(){
-		this.props.fetchVideo(this.id);
-		this.props.fetchComments(this.id);
+		console.log("Video::componentWillMount");
+		this.props.fetchVideo(this.props.params.id);
+		this.props.fetchComments(this.props.params.id);
 	}
 
 	componentDidUpdate(prevProps, prevState){

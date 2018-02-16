@@ -3,9 +3,9 @@ import thunk from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import reducer from '../reducers';
 
+import { routerMiddleware } from 'react-router-redux';
 
-
-export default function configureStore() {
+export default function configureStore(browserHistory) {
 
 	// On récupère la fonction composeEnhancers de l'extension
 	// chrome si elle existe sinon on utiliser la fonction
@@ -18,7 +18,7 @@ export default function configureStore() {
 	  // On enrobe le applyMiddleware avec
 	  // le composeEnhancers de redux-devtools
 	  composeEnhancers(
-	    applyMiddleware(thunk, logger)
+	    applyMiddleware(thunk, logger, routerMiddleware( browserHistory))
 	  )
 	);
 	return store;

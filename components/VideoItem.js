@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router';
 
 const VideoItem = props => (
 	<li className="media">
-		<a href="#">
+		<Link to={`/videos/${props.video.id}`}>
 			<div className="media-left">
 				<img className="media-object"
 					alt="cat" src={'https://loremflickr.com/320/240/cat?r='+Math.random()}
@@ -14,7 +15,7 @@ const VideoItem = props => (
 				<h4 className="media-heading">{props.video.title}</h4>
 				<p>{props.video.description}</p>
 			</div>
-		</a>
+			</Link>
 	</li>
 );
 VideoItem.propTypes = {
