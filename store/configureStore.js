@@ -11,12 +11,14 @@ export default function configureStore(browserHistory) {
 	// chrome si elle existe sinon on utiliser la fonction
 	// compose de redux
 	const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+	let preloadedState = window.__PRELOADED_STATE__ || {};
 
 	const logger = createLogger();
 	const store = createStore(
 	  reducer,
 	  // On enrobe le applyMiddleware avec
-	  // le composeEnhancers de redux-devtools
+		// le composeEnhancers de redux-devtools
+		preloadedState,
 	  composeEnhancers(
 	    applyMiddleware(thunk, logger, routerMiddleware( browserHistory))
 	  )

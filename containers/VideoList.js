@@ -22,10 +22,6 @@ function mapDispatchToProps( dispatch )
 
 class VideoList extends React.Component {
 
-	componentWillMount(){
-		this.props.fetchVideos();
-	}
-
 	render () {
 		return (
 			<div className="row marketing">
@@ -37,11 +33,20 @@ class VideoList extends React.Component {
 			</div>
 		);
 	}
-
+	
 	renderVideos() {
+		console.log(this.props.videos);
 		return this.props.videos.map( ( video ) => {
 			return <VideoItem key={video.id} video={video} />
 		});
+	}
+
+	componentWillMount(){
+		this.props.fetchVideos();
+	}
+
+	static fetchData(store, params, query) {
+		return store.dispatch( fetchVideos() );
 	}
 }
 

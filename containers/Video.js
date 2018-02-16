@@ -134,6 +134,9 @@ class Video extends React.Component {
 		this.props.dislikeVideo( this.props.video.id);
 	}
 
+	static fetchData(store, params, query) {
+		return Promise.all( [store.dispatch( fetchVideo(params.id) ), store.dispatch( fetchComments(params.id) )]);
+	}
 }
 
 export default connect( mapStateToProps, mapDispatchToProps)( Video );
